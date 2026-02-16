@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Мой облачный проект</title>
-
 <style>
 body {
   font-family: sans-serif;
@@ -12,7 +11,6 @@ body {
   padding: 50px;
   background-color: #f4f4f9;
 }
-
 .form-container {
   background: white;
   padding: 25px;
@@ -20,7 +18,6 @@ body {
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   width: 300px;
 }
-
 input {
   width: 100%;
   padding: 10px;
@@ -29,7 +26,6 @@ input {
   border-radius: 5px;
   box-sizing: border-box;
 }
-
 button {
   width: 100%;
   padding: 10px;
@@ -40,14 +36,11 @@ button {
   cursor: pointer;
   border-radius: 5px;
 }
-
 button:hover {
   background: #dfa400;
 }
 </style>
-
 </head>
-
 <body>
 
 <div class="form-container">
@@ -60,46 +53,47 @@ button:hover {
 </div>
 
 <script type="module">
+  // Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyBqMQS0XdgBWCsyjaotXkqunOXK5zRVN6I",
+    authDomain: "qwer-ccfd9.firebaseapp.com",
+    projectId: "qwer-ccfd9",
+    storageBucket: "qwer-ccfd9.appspot.com",
+    messagingSenderId: "253079899037",
+    appId: "1:253079899037:web:8bfc5a64a28640134c3d74",
+    measurementId: "G-H9Z1N7123Z"
+  };
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
 
+  // Обработка формы
+  document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-const firebaseConfig = {
-  apiKey: "ТВОЙ_API_KEY",
-  authDomain: "enter-65f57.firebaseapp.com",
-  projectId: "enter-65f57",
-  storageBucket: "enter-65f57.appspot.com",
-  messagingSenderId: "672982960171",
-  appId: "1:672982960171:web:c2364e2b8087a51f7f426e"
-};
+    const nameInput = document.getElementById("userName").value;
+    const emailInput = document.getElementById("userEmail").value;
 
+    try {
+      await addDoc(collection(db, "requests"), {
+        name: nameInput,
+        email: emailInput,
+        createdAt: new Date()
+      });
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-
-document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const nameInput = document.getElementById("userName").value;
-  const emailInput = document.getElementById("userEmail").value;
-
-  try {
-    await addDoc(collection(db, "requests"), {
-      name: nameInput,
-      email: emailInput,
-      createdAt: new Date()
-    });
-
-    alert("Заявка успешно отправлена!");
-  } catch (error) {
-    console.error("Ошибка:", error);
-    alert("Произошла ошибка");
-  }
-});
-
+      alert("Заявка успешно отправлена!");
+      document.getElementById("feedbackForm").reset(); // Очистка формы
+    } catch (error) {
+      console.error("Ошибка:", error);
+      alert("Произошла ошибка при отправке");
+    }
+  });
 </script>
 
 </body>
