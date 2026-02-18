@@ -50,12 +50,10 @@ window.processLike = async (id) => {
 const docRef = doc(db, "requests", id);
 try {
 await updateDoc(docRef, { likes: increment(1) });
-} catch (e) { 
-console.error("Validation Error:", e.message); 
-}
-};
+} catch (e) { console.error("Validation Error:", e.message); 
+}};
 
-document.getElementById("mainBtn").onclick = async function() {
+document.getElementById("mainBtn").onclick = async () {
 const btn = document.getElementById("mainBtn");
 btn.disabled = true;
 
@@ -67,33 +65,26 @@ likes: 0,
 timestamp: serverTimestamp()
 });
 document.getElementById("email").value = "";
-} catch (e) { 
-alert("Ошибка безопасности: Данные отклонены сервером."); 
-}
-
+} catch (e) { alert("Ошибка безопасности: Данные отклонены сервером."); }
 btn.disabled = false;
 };
 
 const q = query(collection(db, "requests"), orderBy("timestamp", "desc"));
-
 onSnapshot(q, (snapshot) => {
 const feed = document.getElementById("feed");
 feed.innerHTML = "";
-
 snapshot.forEach((docSnap) => {
-const data = docSnap.data();
-
+const data = doc.data();
 feed.innerHTML += `
 <div class="post">
 <span class="time">${data.timestamp?.toDate().toLocaleTimeString() || '...'}</span>
 <b>${data.name}</b>
 <p style="margin: 5px 0;">${data.email}</p>
-<button class="like-btn" onclick="processLike('${docSnap.id}')">${data.likes || 0}</button>
+<button class="like-btn" onclick="processLike('${doc.id}')">👍  ${data.likes || 0}</button>
 </div>
 `;
 });
 });
 </script>
-
 </body>
 </html>
