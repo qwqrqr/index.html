@@ -2,27 +2,46 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, query, orderBy,
-  onSnapshot, serverTimestamp, updateDoc, doc, increment
+  onSnapshot, serverTimestamp, updateDoc, doc, increment, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
-   apiKey : "AIzaSyDFXmN1TkHtZNTWVSzGxUHdP080UvcXuqw" , 
-  authDomain : "project-4974832161812048874.firebaseapp.com" , 
-  projectId : "project-4974832161812048874" , 
-  storageBucket : "project-4974832161812048874.firebasestorage.app" , 
-  messagingSenderId : "958743945605" , 
-  appId : "1:958743945605:web:3e1ecb59bcf844204b24ec" , 
+  apiKey : "AIzaSyDFXmN1TkHtZNTWVSzGxUHdP080UvcXuqw",
+  authDomain : "project-4974832161812048874.firebaseapp.com",
+  projectId : "project-4974832161812048874",
+  storageBucket : "project-4974832161812048874.firebasestorage.app",
+  messagingSenderId : "958743945605",
+  appId : "1:958743945605:web:3e1ecb59bcf844204b24ec",
   measurementId : "G-88EL66HM23"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Увеличивает лайки у записи
 window.processLike = async (id) => {
   const docRef = doc(db, "requests", id);
   await updateDoc(docRef, { likes: increment(1) });
 };
 
+// Удаляет запись по ID
+window.deleteRequest = async (id) => {
+  if (!confirm("Вы уверены, что хотите удалить запись?")) return;
+  const docRef = doc(db, "requests", id);
+  await deleteDoc(docRef);
+};
+
+// Обновляет email у конкретной записи
+window.updateEmail = async (id, newEmail) => {
+  if (!newEmail.trim()) {
+    alert("Email не может быть пустым");
+    return;
+  }
+  const docRef = doc(db, "requests", id);
+  await updateDoc(docRef, { email: newEmail });
+};
+
+// Добавление новой записи
 document.getElementById('mainBtn').onclick = async () => {
   const btn = document.getElementById('mainBtn');
   const name = document.getElementById('name').value.trim();
@@ -54,6 +73,7 @@ document.getElementById('mainBtn').onclick = async () => {
   btn.disabled = false;
 };
 
+// Вывод списка записей
 const q = query(collection(db, "requests"), orderBy("timestamp", "desc"));
 
 onSnapshot(q, (snapshot) => {
@@ -74,6 +94,12 @@ onSnapshot(q, (snapshot) => {
         <p>${data.email}</p>
         <button class="like-btn" onclick="processLike('${docItem.id}')">
           👍 ${data.likes || 0}
+        </button>
+        <button class="delete-btn" onclick="deleteRequest('${docItem.id}')">
+          🗑 Удалить
+        </button>
+        <button class="update-btn" onclick="updateEmail('${docItem.id}', prompt('Введите новый email:', '${data.email}'))">
+          ✏️ Обновить email
         </button>
       </div>
     `;
